@@ -1,4 +1,4 @@
-# Personal Firewall with Python
+# Personal Firewall using Python
 
 A **personal firewall** is an essential security component that monitors and controls incoming and outgoing network traffic based on predefined rules. This project implements a **Python-based custom firewall** designed for individual users and developers who want deeper visibility and control over the network packets traversing their system.
 
