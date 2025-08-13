@@ -8,23 +8,7 @@ Whether you're learning cybersecurity, developing network-aware applications, or
 
 ---
 
-## 📁 Project Structure
-
-personal-firewall/ <br>
-├── firewall.py # Main packet sniffer and filtering logic <br>
-├── logger.py # Logging system for packet activities <br>
-├── utils.py # Helper functions for packet handling <br>
-├── iptables.py # OS-level command integration (iptables) <br>
-├── gui.py # GUI to view, add, and delete rules <br>
-├── rules.json # JSON-based rule definitions <br>
-├── logs.txt # Logs for blocked or allowed traffic <br>
-├── .gitignore # Ignored files (.venv, pycache, etc.) <br>
-└── requirements.txt # Required packages 
-
-
----
-
-## 🔍 Module Descriptions
+##  Module Descriptions
 
 ### `firewall.py`
 The core of the firewall. It uses `Scapy` to sniff network packets in real time and checks them against rules from `rules.json`. Based on the match, it allows or blocks packets and logs the activity.
@@ -64,7 +48,7 @@ Contains all firewall rules in JSON format. These rules define which packets to 
 
 ---
 
-## 🚀 Getting Started
+## Getting Started
 
 ### 1. Install dependencies
 ```bash
@@ -76,38 +60,27 @@ pip install -r requirements.txt
 sudo python3 firewall.py
 ```
 
-## 🛠 Tools & Technologies
+## Tools & Technologies
+- Python 3
+- Scapy – For packet sniffing
+- Tkinter – GUI
+- JSON – Rule storage
+- iptables (Linux) – System-level packet filtering (optional)
 
-Python 3
+## Features
+- Real-time packet sniffing
+- IP/Port/Protocol-based filtering
+- Rule management via GUI
+- Logging of all decisions
+- Optional iptables integration
 
-Scapy – For packet sniffing
+## Notes
+- Designed for Linux
+- Requires sudo to sniff packets
+- GUI is optional but enhances usability
 
-Tkinter – GUI
-
-JSON – Rule storage
-
-iptables (Linux) – System-level packet filtering (optional)
-
-## ✅ Features
-Real-time packet sniffing
-
-IP/Port/Protocol-based filtering
-
-Rule management via GUI
-
-Logging of all decisions
-
-Optional iptables integration
-
-## ⚠️ Notes
-Designed for Linux
-
-Requires sudo to sniff packets
-
-GUI is optional but enhances usability
-
-## 📜 License
+## License
 This project is released under the MIT License.
 
-## 🔚 Conclusion
+## Conclusion
 This personal firewall project blends the power of packet sniffing, rule-based filtering, and user-friendly design into a compact security tool. Whether you're a beginner exploring cybersecurity or a developer seeking control over network traffic, this project offers a practical and educational solution. 
