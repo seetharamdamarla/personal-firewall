@@ -1,0 +1,25 @@
+[Unit]
+Description=Personal Firewall — Scapy Packet Sniffer
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+# IMPORTANT: Change enp0s1 to your Ubuntu Server's actual network interface
+# Run 'ip link show' to find it
+Environment=SNIFFER_IFACE=enp0s1
+ExecStart=/opt/personal-firewall/venv/bin/python3 /opt/personal-firewall/sniffer.py
+Restart=on-failure
+RestartSec=5
+StandardOutput=journal
+StandardError=journal
+
+# Security hardening
+NoNewPrivileges=false
+ProtectSystem=strict
+ReadWritePaths=/var/log/personal-firewall
+# Needs CAP_NET_RAW for raw socket capture, CAP_NET_ADMIN for interface config
+AmbientCapabilities=CAP_NET_RAW CAP_NET_ADMIN
+
+[Install]
+WantedBy=multi-user.target

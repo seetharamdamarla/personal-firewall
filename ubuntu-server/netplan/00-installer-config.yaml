@@ -1,0 +1,22 @@
+# Ubuntu Server Static IP Configuration
+# Copy to: /etc/netplan/00-installer-config.yaml
+# Apply with: sudo netplan apply
+#
+# Network: 172.16.206.0/24 (your Mac's Wi-Fi subnet)
+# Interface: enp0s1 (verify with 'ip link show' — may differ on your VM)
+# Gateway: 172.16.206.153 (your router's IP)
+network:
+  version: 2
+  renderer: networkd
+  ethernets:
+    enp0s1:
+      dhcp4: false
+      addresses:
+        - 172.16.206.50/24
+      routes:
+        - to: default
+          via: 172.16.206.153
+      nameservers:
+        addresses:
+          - 8.8.8.8
+          - 8.8.4.4

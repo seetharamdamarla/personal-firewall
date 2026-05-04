@@ -1,0 +1,36 @@
+# ── Environment ──
+.env
+*.env.local
+
+# ── Python ──
+__pycache__/
+*.pyc
+*.pyo
+venv/
+.venv/
+*.egg-info/
+
+# ── Node / React ──
+node_modules/
+dist/
+build/
+.next/
+
+# ── Logs ──
+*.log
+*.jsonl
+
+# ── SQLite ──
+*.db
+*.sqlite
+*.sqlite3
+
+# ── OS ──
+.DS_Store
+Thumbs.db
+
+# ── IDE ──
+.vscode/
+.idea/
+*.swp
+*.swo
