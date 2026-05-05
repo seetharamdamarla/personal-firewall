@@ -1,0 +1,65 @@
+# ============================================================
+# Personal Firewall — Suricata YAML Config Overrides
+# ============================================================
+# This file contains only the sections you need to CHANGE
+# in /etc/suricata/suricata.yaml. Do NOT replace the entire
+# file — edit in-place using these as reference.
+# ============================================================
+
+# ── 1. HOME_NET — Set to your Ubuntu Server IP ──
+# Find the line: HOME_NET: "[192.168.0.0/16, ..."
+# Replace with:
+vars:
+  address-groups:
+    HOME_NET: "[172.16.206.50/32]"
+    EXTERNAL_NET: "!$HOME_NET"
+    HTTP_SERVERS: "$HOME_NET"
+    SSH_SERVERS: "$HOME_NET"
+
+# ── 2. Interface — Set to your Ubuntu NIC ──
+# Find the af-packet section and set:
+af-packet:
+  - interface: enp0s1
+    cluster-id: 99
+    cluster-type: cluster_flow
+    defrag: yes
+    use-mmap: yes
+    tpacket-v3: yes
+
+# ── 3. EVE JSON Output — Main log for Splunk ingestion ──
+# This should already be enabled by default.
+# Verify these settings exist under outputs:
+outputs:
+  - eve-log:
+      enabled: yes
+      filetype: regular
+      filename: eve.json
+      types:
+        - alert:
+            tagged-packets: yes
+            metadata: yes
+        - http:
+            extended: yes
+        - dns:
+            enabled: yes
+        - tls:
+            extended: yes
+        - files:
+            force-magic: no
+        - ssh
+        - stats:
+            totals: yes
+            threads: no
+            deltas: yes
+        - flow
+
+# ── 4. Custom Rules — Add our rule file ──
+# Find the rule-files section and add:
+rule-files:
+  - suricata.rules
+  - personal-firewall.rules
+
+# ── 5. Stats — Enable periodic stats ──
+stats:
+  enabled: yes
+  interval: 30
