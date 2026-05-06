@@ -1,0 +1,58 @@
+<!--
+  Personal Firewall — Custom Wazuh Rules
+  Rule IDs: 100050–100055 (avoids conflict with custom_detections.xml 100001–100007)
+  Location: /var/ossec/etc/rules/personal-firewall.xml
+  
+  NOTE: Uses if_matched_sid 5760 (auth failed for existing user), not 5710 
+  (non-existent user). This is because sshpass brute force targets "root" which exists.
+-->
+<group name="personal-firewall,">
+
+  <!-- SSH Brute Force: 5+ failed auth from same IP in 30 seconds -->
+  <rule id="100050" level="10" frequency="5" timeframe="30">
+    <if_matched_sid>5760</if_matched_sid>
+    <same_source_ip />
+    <description>PF — SSH Brute Force: 5+ failed logins from same IP in 30s</description>
+    <group>authentication_failed,pf-ssh-brute,</group>
+  </rule>
+
+  <!-- SSH Brute Force Confirmed: 10+ failed auth in 60 seconds -->
+  <rule id="100051" level="13" frequency="10" timeframe="60">
+    <if_matched_sid>5760</if_matched_sid>
+    <same_source_ip />
+    <description>PF — SSH Brute Force CONFIRMED: 10+ failed logins in 60s</description>
+    <group>authentication_failed,pf-ssh-brute-confirmed,</group>
+  </rule>
+
+  <!-- FIM: Sudoers file modified -->
+  <rule id="100052" level="12">
+    <if_sid>550</if_sid>
+    <match>/etc/sudoers</match>
+    <description>PF — Sudoers file modified</description>
+    <group>pf-fim-critical,</group>
+  </rule>
+
+  <!-- FIM: SSH config modified -->
+  <rule id="100053" level="10">
+    <if_sid>550</if_sid>
+    <match>/etc/ssh</match>
+    <description>PF — SSH configuration modified</description>
+    <group>pf-fim-ssh,</group>
+  </rule>
+
+  <!-- FIM: Suricata rules modified -->
+  <rule id="100054" level="10">
+    <if_sid>550</if_sid>
+    <match>suricata</match>
+    <description>PF — Suricata config/rules modified</description>
+    <group>pf-fim-suricata,</group>
+  </rule>
+
+  <!-- New user added to system -->
+  <rule id="100055" level="10">
+    <if_sid>5901</if_sid>
+    <description>PF — New user account created</description>
+    <group>pf-user-created,</group>
+  </rule>
+
+</group>
