@@ -13,20 +13,47 @@ class IPRequest(BaseModel):
 
 @router.get("/blocked", response_model=List[dict])
 def get_blocked_ips(db: Session = Depends(database.get_db)):
-    active_blocks = db.query(models.BlockedIP).filter(models.BlockedIP.is_active == True).all()
-    # Cross-reference with live nftables state
+    # 1. Get live state from Linux kernel
     system_ips = nftables_mgr.get_blocked_ips()
     
-    return [
-        {
-            "ip": b.ip_address,
-            "threat_score": b.threat_score,
-            "country": b.country_code,
-            "reason": b.reason,
-            "in_system": b.ip_address in system_ips,
-            "created_at": b.created_at
-        } for b in active_blocks
-    ]
+    # 2. Get current DB state
+    active_blocks = db.query(models.BlockedIP).filter(models.BlockedIP.is_active == True).all()
+    db_ips = {b.ip_address: b for b in active_blocks}
+    
+    results = []
+    
+    # 3. Sync Wazuh auto-blocks into the Database
+    for ip in system_ips:
+        if ip not in db_ips:
+            new_block = models.BlockedIP(
+                ip_address=ip,
+                reason="Auto-blocked by Wazuh IDS",
+                threat_score=0,
+                country_code="Unknown",
+                is_active=True
+            )
+            db.add(new_block)
+            db.commit()
+            db.refresh(new_block)
+            db_ips[ip] = new_block
+
+    # 4. Build response and clean up expired blocks
+    for ip, b in db_ips.items():
+        if ip in system_ips:
+            results.append({
+                "ip": b.ip_address,
+                "threat_score": b.threat_score,
+                "country": b.country_code,
+                "reason": b.reason,
+                "in_system": True,
+                "created_at": b.created_at
+            })
+        else:
+            # The block expired in nftables (e.g., 5-min timeout), so mark inactive in DB
+            b.is_active = False
+            db.commit()
+            
+    return results
 
 @router.post("/block")
 def block_ip(req: IPRequest, db: Session = Depends(database.get_db)):
