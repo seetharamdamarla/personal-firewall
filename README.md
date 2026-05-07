@@ -41,14 +41,14 @@ graph TD
 - **SIEM Aggregation (Splunk)**: Centralized logging with custom XML dashboards for live threat hunting.
 - **REST API (FastAPI)**: Python backend that synchronizes kernel-level firewall rules with an SQLite database.
 - **Threat Intelligence**: Integrates with the AbuseIPDB API to automatically score and locate attacking IP addresses.
-- **SOC Web Dashboard (React)**: High-performance interface to manually block IPs, unblock IPs, and monitor live attack metrics.
+- **SOC Web Dashboard (React)**: Professional enterprise-grade interface using Tailwind CSS and Framer Motion, featuring a highly realistic 3D WebGL Attack Origin Map with animated radar ping geolocation, and full manual threat mitigation controls.
 
 ## Technology Stack
 - **Infrastructure**: Ubuntu Server, Kali Linux, macOS
 - **Cybersecurity**: Suricata, Wazuh, nftables, AbuseIPDB
 - **Data & Logging**: Splunk Enterprise, Splunk Universal Forwarder
 - **Backend Development**: Python, FastAPI, SQLAlchemy, SQLite
-- **Frontend Development**: React, Vite, Vanilla CSS, Axios, Lucide-React
+- **Frontend Development**: React, Vite, Tailwind CSS, Framer Motion, React-Globe.GL (WebGL), Aceternity UI
 
 ## Implementation Phases
 
@@ -57,7 +57,7 @@ graph TD
 3. **Wazuh & Active Response**: Configured HIDS and wrote custom bash scripts to interface with `nftables` for immediate packet dropping upon detection.
 4. **Splunk Integration**: Configured Universal Forwarder to ship Suricata and Wazuh logs to a centralized Splunk instance. Built targeted XML dashboards for analysis.
 5. **FastAPI Development**: Built a complete Python REST API to synchronize OS-level firewall states into a relational database and expose management endpoints.
-6. **React Dashboard**: Designed a web interface for incident responders to view metrics and manage firewall blocks in real-time.
+6. **React Dashboard**: Designed a clean, professional React application using Tailwind CSS and Framer Motion for incident responders to view metrics and manage firewall blocks in real-time, including a 3D Earth visualization.
 7. **Attack Simulation**: Built an automated simulation suite to systematically test the pipeline under varying attack loads.
 
 ## Usage (Attack Simulation)
