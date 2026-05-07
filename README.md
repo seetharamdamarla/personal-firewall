@@ -1,80 +1,76 @@
-# 🛡️ Personal Firewall — SOC Analyst Demo Environment
+# 🛡️ Enterprise Security Operations Center (SOC) & Auto-Mitigation Firewall
 
-A full Security Operations Center (SOC) demo environment featuring dual-SIEM architecture (Splunk + Wazuh), automated threat detection, and live incident response — built for cybersecurity portfolio interviews.
+![SOC Dashboard Dashboard](https://img.shields.io/badge/Status-Active-success)
+![React](https://img.shields.io/badge/Frontend-React-blue)
+![FastAPI](https://img.shields.io/badge/Backend-FastAPI-009688)
+![Splunk](https://img.shields.io/badge/SIEM-Splunk-black)
+![Wazuh](https://img.shields.io/badge/HIDS-Wazuh-005E8C)
+![Suricata](https://img.shields.io/badge/IDS-Suricata-EF3B2D)
+
+## 📌 Project Overview
+A complete, end-to-end Security Operations Center (SOC) and automated threat mitigation pipeline. This project simulates an enterprise security architecture, featuring network intrusion detection, host-based monitoring, automated firewall blocking, centralized SIEM logging, and a custom React web dashboard for manual intervention and live threat intelligence.
 
 ## 🏗️ Architecture
 
-```
-Kali (attack) → Ubuntu NIC → Scapy sniffer + Suricata IDS
-  → Suricata EVE JSON → Splunk (Network SIEM)
-  → Wazuh agent → Wazuh Manager (Host-based IDS)
-  → Splunk correlation → webhook → FastAPI → nftables DROP
-  → Wazuh active response → nftables DROP
-  → FastAPI → WebSocket → React SOC Dashboard (live updates)
-  → SQLite (alert history)
-```
-
-## 🧰 Stack
-
-| Layer | Component | Purpose |
-|-------|-----------|---------|
-| Network Capture | Scapy + Suricata | Packet sniffing + IDS rules |
-| Host IDS | Wazuh (single-node) | FIM, auth monitoring, active response |
-| Network SIEM | Splunk Free | Log aggregation, correlation, dashboards |
-| Backend | FastAPI + SQLite | Alert API, nftables control, threat intel |
-| Frontend | React + Recharts + Leaflet | Live SOC dashboard |
-| Attacker | Kali Linux | Nmap, hping3, Hydra, Scapy |
-
-## 📂 Project Structure
-
-```
-personal-firewall/
-├── ubuntu-server/
-│   ├── sniffer/          # Scapy packet capture daemon
-│   ├── suricata/         # Custom Suricata rules (Phase 2)
-│   ├── wazuh/            # Wazuh custom rules & configs (Phase 3)
-│   ├── splunk/           # Splunk configs & dashboards (Phase 4)
-│   └── netplan/          # Network configuration reference
-├── backend/              # FastAPI application (Phase 5)
-├── frontend/             # React SOC dashboard (Phase 6)
-├── kali/                 # Attack simulator scripts (Phase 7)
-├── .env.example          # Environment variable template
-└── README.md
+```mermaid
+graph TD
+    A[Kali Linux Attacker] -->|Port Scans, DDoS, SSH Brute Force| B(Ubuntu Server)
+    
+    subgraph Ubuntu Detection Engine
+        B --> C[Suricata NIDS]
+        B --> D[Wazuh HIDS]
+        C -->|eve.json| E[Splunk Universal Forwarder]
+        D -->|alerts.json| E
+        D -->|Active Response| F[nftables Kernel Firewall]
+    end
+    
+    subgraph Management Layer
+        F --> G[FastAPI Backend]
+        G -->|Queries| H[AbuseIPDB Threat Intel API]
+        G -->|Stores| I[(SQLite DB)]
+    end
+    
+    E -->|Port 9997| J[Mac Splunk Enterprise SIEM]
+    G -.->|REST API & WebSockets| K[React SOC Dashboard]
 ```
 
-## 🚀 Build Phases
+## 🚀 Features
+- **Network IDS (Suricata)**: Detects port scans, SYN floods, and malware signatures.
+- **Host IDS (Wazuh)**: Monitors `auth.log` for SSH brute force attacks and triggers Active Response scripts.
+- **Auto-Mitigation**: Automatically drops malicious IPs at the kernel level using `nftables`.
+- **SIEM Aggregation (Splunk)**: Centralized logging with custom XML dashboards for live threat hunting.
+- **REST API (FastAPI)**: Python backend that synchronizes kernel-level firewall rules with an SQLite database.
+- **Threat Intelligence**: Integrates with AbuseIPDB API to automatically score and locate attacking IP addresses.
+- **SOC Web Dashboard (React)**: Premium glassmorphism UI to manually block IPs, unblock IPs, and monitor live attack metrics.
 
-- [x] **Phase 1** — Lab Network Setup (UTM bridged networking, Scapy daemon)
-- [ ] **Phase 2** — Suricata IDS + Custom Rules
-- [ ] **Phase 3** — Wazuh Single-Node + Custom Rules
-- [ ] **Phase 4** — Splunk + Universal Forwarder + Dashboards
-- [ ] **Phase 5** — FastAPI Backend
-- [ ] **Phase 6** — React SOC Dashboard
-- [ ] **Phase 7** — Kali Attack Simulator
-- [ ] **Phase 8** — End-to-End Testing + Documentation
+## 🛠️ Technology Stack
+- **Infrastructure**: Ubuntu Server, Kali Linux, macOS
+- **Cybersecurity**: Suricata, Wazuh, nftables, AbuseIPDB
+- **Data & Logging**: Splunk Enterprise, Splunk Universal Forwarder
+- **Backend Development**: Python, FastAPI, SQLAlchemy, SQLite
+- **Frontend Development**: React, Vite, Vanilla CSS, Axios, Lucide-React
 
-## 🎯 Interview Demo Flow
+## 💻 Phases Completed
 
-1. Launch attack from Kali (Nmap scan or SYN flood)
-2. Suricata detects network attack → logs to Splunk
-3. Wazuh detects host events (failed SSH, file changes)
-4. Auto-block fires via nftables within 5 seconds
-5. React dashboard shows live alert feed + GeoIP map
-6. Both Splunk and Wazuh dashboards visible side-by-side
+1. **Lab Networking**: Established secure routing and NAT between Kali, Ubuntu, and macOS.
+2. **Suricata Implementation**: Deployed NIDS and wrote custom IDS rules to detect Nmap and DoS tools.
+3. **Wazuh & Active Response**: Configured HIDS and wrote custom bash scripts to interface with `nftables` for immediate packet dropping.
+4. **Splunk Integration**: Setup Universal Forwarder to ship Suricata `eve.json` and Wazuh `alerts.json` to Mac-based Splunk instance. Built 3 custom XML dashboards.
+5. **FastAPI Development**: Built a complete Python REST API to act as the "brain", syncing OS-level firewall states into a relational database.
+6. **React Dashboard**: Designed a high-performance web UI with zero-dependency CSS glassmorphism.
+7. **Attack Simulation**: Built an automated Python script on Kali to systematically test the pipeline.
 
-## 📋 Prerequisites
-
-- macOS with [UTM](https://mac.getutm.app/) installed
-- Ubuntu Server 22.04 LTS VM (bridged networking)
-- Kali Linux VM (bridged networking)
-- Both VMs on the same bridged network segment
-
-## ⚙️ Quick Start
-
-1. Clone this repo
-2. Copy `.env.example` to `.env` and fill in your lab IPs
-3. Follow the phase guides in order
+## 🛡️ Usage (Attack Simulation)
+To test the auto-mitigation pipeline, run the simulator on Kali:
+```bash
+python3 attack_simulator.py
+```
+1. Select an attack vector (e.g., SSH Brute Force).
+2. Wazuh detects the anomalous login attempts.
+3. Wazuh triggers `nftables-block.sh`.
+4. The IP is dropped at the kernel layer.
+5. The FastAPI backend auto-syncs the new rule.
+6. The React Dashboard automatically displays the new threat.
 
 ---
-
-*Built as a cybersecurity portfolio project demonstrating enterprise SOC architecture.*
+*Developed by Seetharam Damarla as a comprehensive portfolio project demonstrating Full-Stack Cybersecurity Engineering.*
