@@ -7,6 +7,9 @@
 ![Wazuh](https://img.shields.io/badge/HIDS-Wazuh-005E8C)
 ![Suricata](https://img.shields.io/badge/IDS-Suricata-EF3B2D)
 
+## Live Demonstration
+**[Watch the 3-Minute Video Demo Here](https://www.loom.com/share/439f958a10924b00896e354ad9a25c3b)** - *Shows live Kali Linux attacks being auto-mitigated and visualized on the 3D React Dashboard.*
+
 ## Project Overview
 A complete, end-to-end Security Operations Center (SOC) and automated threat mitigation pipeline. This project simulates an enterprise security architecture, featuring network intrusion detection, host-based monitoring, automated firewall blocking, centralized SIEM logging, and a custom React web dashboard for manual intervention and live threat intelligence.
 
