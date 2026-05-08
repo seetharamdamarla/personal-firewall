@@ -25,17 +25,25 @@ def get_blocked_ips(db: Session = Depends(database.get_db)):
     # 3. Sync Wazuh auto-blocks into the Database
     for ip in system_ips:
         if ip not in db_ips:
-            new_block = models.BlockedIP(
-                ip_address=ip,
-                reason="Auto-blocked by Wazuh IDS",
-                threat_score=0,
-                country_code="Unknown",
-                is_active=True
-            )
-            db.add(new_block)
-            db.commit()
-            db.refresh(new_block)
-            db_ips[ip] = new_block
+            # Check if it exists in DB but is inactive
+            existing_block = db.query(models.BlockedIP).filter(models.BlockedIP.ip_address == ip).first()
+            if existing_block:
+                existing_block.is_active = True
+                existing_block.reason = "Auto-blocked by Wazuh IDS"
+                db.commit()
+                db_ips[ip] = existing_block
+            else:
+                new_block = models.BlockedIP(
+                    ip_address=ip,
+                    reason="Auto-blocked by Wazuh IDS",
+                    threat_score=0,
+                    country_code="Unknown",
+                    is_active=True
+                )
+                db.add(new_block)
+                db.commit()
+                db.refresh(new_block)
+                db_ips[ip] = new_block
 
     # 4. Build response and clean up expired blocks
     for ip, b in db_ips.items():
