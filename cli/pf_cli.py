@@ -119,7 +119,10 @@ async def _stream_alerts():
                     if source == "suricata":
                         console.print(f"[[bold red]SURICATA[/]] {alert.get('alert_type', '')} from {alert.get('src_ip')} -> {alert.get('dest_ip')}")
                     elif source == "wazuh":
-                        console.print(f"[[bold blue]WAZUH[/]] {alert.get('description', '')} on {alert.get('agent_name')} (Level {alert.get('rule_level')})")
+                        ip = alert.get("src_ip", "Unknown")
+                        action = alert.get("action", "block")
+                        ts = alert.get("timestamp", "")
+                        console.print(f"[[bold blue]WAZUH[/]] {ts} - Action: [bold yellow]{action.upper()}[/] | Target IP: [bold red]{ip}[/]")
                     else:
                         console.print(f"[raw alert] {message}")
                 except json.JSONDecodeError:
