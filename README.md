@@ -1,80 +1,111 @@
-# Enterprise Security Operations Center (SOC) & Auto-Mitigation Firewall
+# Enterprise Security Operations Center (SOC) & Auto-Mitigation Pipeline
 
 ![Status Active](https://img.shields.io/badge/Status-Active-success)
-![React](https://img.shields.io/badge/Frontend-React-blue)
+![Python](https://img.shields.io/badge/CLI-Python-blue)
 ![FastAPI](https://img.shields.io/badge/Backend-FastAPI-009688)
 ![Splunk](https://img.shields.io/badge/SIEM-Splunk-black)
 ![Wazuh](https://img.shields.io/badge/HIDS-Wazuh-005E8C)
 ![Suricata](https://img.shields.io/badge/IDS-Suricata-EF3B2D)
 
-## Live Demonstration
-**[Watch the 3-Minute Video Demo Here](https://www.loom.com/share/439f958a10924b00896e354ad9a25c3b)** - *Shows live Kali Linux attacks being auto-mitigated and visualized on the 3D React Dashboard.*
+## Executive Summary
+This project is an **end-to-end Security Operations Center (SOC) simulation and automated threat mitigation pipeline**. Designed to mimic real-world enterprise security architectures, it demonstrates the full lifecycle of cybersecurity defense: from identifying malicious network packets to automatically dropping the attacker at the Linux kernel level, culminating in real-time threat analysis via a custom Python Command-Line Interface (CLI).
 
-## Project Overview
-A complete, end-to-end Security Operations Center (SOC) and automated threat mitigation pipeline. This project simulates an enterprise security architecture, featuring network intrusion detection, host-based monitoring, automated firewall blocking, centralized SIEM logging, and a custom React web dashboard for manual intervention and live threat intelligence.
+**For Recruiters & Engineering Leaders:** 
+This repository serves as a comprehensive demonstration of skills across **Cybersecurity Engineering** (IDS/IPS tuning, SIEM integration), **Systems Administration** (Linux networking, `nftables`), and **Software Engineering** (FastAPI backend development, WebSocket streaming, and Python CLI tooling).
 
-## Architecture
+---
+
+## Core Capabilities
+*   **Intrusion Detection (NIDS/HIDS):** Utilizes **Suricata** to detect network anomalies (SYN floods, malware signatures) and **Wazuh** to monitor host-level threats (SSH brute-force, privilege escalation).
+*   **Kernel-Level Auto-Mitigation:** Wazuh Active Responses trigger custom shell scripts that immediately drop malicious IP addresses using Linux `nftables`—halting attacks in milliseconds.
+*   **Centralized SIEM Logging:** All events are ingested by a Splunk Universal Forwarder and shipped to Splunk Enterprise for indexing and dashboard visualization.
+*   **REST API Integration:** A high-performance Python **FastAPI** backend synchronizes the live OS firewall state with a persistent SQLite database.
+*   **Threat Intelligence Enrichment:** Automatically queries the **AbuseIPDB API** to assign threat scores and geolocate attacking IPs.
+*   **Real-Time CLI Dashboard:** A robust, visually appealing Python CLI (built with Typer & Rich) allows security analysts to manage blocks and stream live security alerts directly in the terminal via WebSockets.
+
+---
+
+## System Architecture
 
 ```mermaid
 graph TD
-    A[Attacker] -->|Port Scans, DDoS, SSH Brute Force| B(Ubuntu Server)
+    A[Attacker IP] -->|Port Scans, DDoS, Brute Force| B(Target: Ubuntu Server)
     
-    subgraph Ubuntu Detection Engine
+    subgraph Detection & Auto-Mitigation Layer
         B --> C[Suricata NIDS]
         B --> D[Wazuh HIDS]
         C -->|eve.json| E[Splunk Universal Forwarder]
         D -->|alerts.json| E
-        D -->|Active Response| F[nftables Kernel Firewall]
+        D -->|Active Response Trigger| F[nftables Kernel Firewall]
     end
     
-    subgraph Management Layer
-        F --> G[FastAPI Backend]
-        G -->|Queries| H[AbuseIPDB Threat Intel API]
-        G -->|Stores| I[(SQLite DB)]
+    subgraph Management API Layer
+        F <-->|Reads/Writes Rules| G[FastAPI Backend]
+        G -->|API Queries| H[AbuseIPDB Threat Intel]
+        G <-->|State Sync| I[(SQLite DB)]
     end
     
     E -->|Port 9997| J[Splunk Enterprise SIEM]
-    G -.->|REST API & WebSockets| K[React SOC Dashboard]
+    G -.->|REST HTTP & WebSockets| K[Python SOC CLI Analyst Tool]
 ```
-
-## Features
-- **Network IDS (Suricata)**: Detects port scans, SYN floods, and malware signatures.
-- **Host IDS (Wazuh)**: Monitors authentication logs for brute force attacks and triggers Active Response scripts.
-- **Auto-Mitigation**: Automatically drops malicious IPs at the kernel level using `nftables`.
-- **SIEM Aggregation (Splunk)**: Centralized logging with custom XML dashboards for live threat hunting.
-- **REST API (FastAPI)**: Python backend that synchronizes kernel-level firewall rules with an SQLite database.
-- **Threat Intelligence**: Integrates with the AbuseIPDB API to automatically score and locate attacking IP addresses.
-- **SOC Web Dashboard (React)**: Professional enterprise-grade interface using Tailwind CSS and Framer Motion, featuring a highly realistic 3D WebGL Attack Origin Map with animated radar ping geolocation, and full manual threat mitigation controls.
-
-## Technology Stack
-- **Infrastructure**: Ubuntu Server, Kali Linux, macOS
-- **Cybersecurity**: Suricata, Wazuh, nftables, AbuseIPDB
-- **Data & Logging**: Splunk Enterprise, Splunk Universal Forwarder
-- **Backend Development**: Python, FastAPI, SQLAlchemy, SQLite
-- **Frontend Development**: React, Vite, Tailwind CSS, Framer Motion, React-Globe.GL (WebGL), Aceternity UI
-
-## Implementation Phases
-
-1. **Lab Networking**: Established secure routing and NAT between the attacker node, the target server, and the management host.
-2. **Suricata Implementation**: Deployed NIDS and wrote custom IDS rules to detect reconnaissance and denial-of-service tools.
-3. **Wazuh & Active Response**: Configured HIDS and wrote custom bash scripts to interface with `nftables` for immediate packet dropping upon detection.
-4. **Splunk Integration**: Configured Universal Forwarder to ship Suricata and Wazuh logs to a centralized Splunk instance. Built targeted XML dashboards for analysis.
-5. **FastAPI Development**: Built a complete Python REST API to synchronize OS-level firewall states into a relational database and expose management endpoints.
-6. **React Dashboard**: Designed a clean, professional React application using Tailwind CSS and Framer Motion for incident responders to view metrics and manage firewall blocks in real-time, including a 3D Earth visualization.
-7. **Attack Simulation**: Built an automated simulation suite to systematically test the pipeline under varying attack loads.
-
-## Usage (Attack Simulation)
-To test the auto-mitigation pipeline, execute the simulator script:
-```bash
-python3 attack_simulator.py
-```
-1. Select an attack vector (e.g., SSH Brute Force).
-2. Wazuh detects the anomalous login attempts.
-3. Wazuh triggers the active response script.
-4. The IP is dropped at the kernel layer via `nftables`.
-5. The FastAPI backend auto-syncs the new firewall rule.
-6. The React Dashboard automatically displays the new threat metrics.
 
 ---
-*Developed by Seetharam Damarla*
 
+## Technology Stack
+
+| Category | Technologies Used |
+| :--- | :--- |
+| **Infrastructure** | Ubuntu Server (Defender), Kali Linux (Attacker), Linux Kernel Networking |
+| **Security & SIEM** | Suricata, Wazuh, `nftables`, Splunk Enterprise |
+| **Backend API** | Python 3, FastAPI, SQLAlchemy, SQLite, Uvicorn |
+| **CLI & Tooling** | Python 3, Typer, Rich (Terminal UI), Requests, WebSockets |
+
+---
+
+## How It Works (The Threat Lifecycle)
+1. **The Attack:** A Kali Linux machine runs an automated script simulating an SSH brute-force attack against the Ubuntu Server.
+2. **Detection:** The Wazuh agent analyzes `/var/log/auth.log`, identifies the rapid authentication failures, and flags it as a Level 10 threat.
+3. **Auto-Mitigation:** The Wazuh manager instantly triggers a local Active Response script, pushing an `nftables` rule to drop all incoming packets from the attacker's IP.
+4. **Data Sync:** The FastAPI backend detects the new kernel-level block, saves the record to the SQLite database, and queries AbuseIPDB for threat context.
+5. **Analyst Review:** A security engineer opens the **Python CLI**, runs `pf-cli list` to see the newly blocked IP, and runs `pf-cli monitor` to watch live alerts stream in.
+
+---
+
+## Deployment & Usage Guide
+
+To run the management API and interact with the CLI locally, follow these steps. *(Note: Full kernel-level auto-mitigation requires deploying the `ubuntu-server` components on a Linux machine with `nftables`)*.
+
+### 1. Start the Backend API
+The backend acts as the bridge between the database, the threat intelligence API, and the firewall.
+```bash
+# Navigate to the backend directory
+cd ubuntu-server/backend
+
+# Install dependencies
+pip install -r requirements.txt
+
+# Start the FastAPI server (Runs on http://localhost:8000)
+uvicorn main:app --host 127.0.0.1 --port 8000
+```
+
+### 2. Use the SOC CLI
+Open a **new, separate terminal window** to run the CLI tool.
+
+```bash
+# Navigate to the CLI directory
+cd cli
+
+# Install CLI dependencies (Typer, Rich, etc.)
+pip install -r requirements.txt
+```
+
+**Available CLI Commands:**
+*   `python3 pf_cli.py status` : Ping the API to ensure the SOC backend is online.
+*   `python3 pf_cli.py list` : Display a visually formatted table of all currently blocked malicious IPs.
+*   `python3 pf_cli.py block <IP>` : Manually apply a block to a suspicious IP and retrieve its AbuseIPDB threat score.
+*   `python3 pf_cli.py unblock <IP>` : Remove an IP from the blocklist.
+*   `python3 pf_cli.py threat <IP>` : Query the threat intelligence score for a specific IP.
+*   `python3 pf_cli.py monitor` : Connect to the WebSocket stream and watch real-time Suricata and Wazuh alerts print directly to your terminal.
+
+---
+*Architected and Developed by Seetharam Damarla*
