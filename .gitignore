@@ -28,6 +28,7 @@ build/
 # ── OS ──
 .DS_Store
 Thumbs.db
+sync.sh
 
 # ── IDE ──
 .vscode/

@@ -1,6 +1,9 @@
 from fastapi import FastAPI, WebSocket, WebSocketDisconnect
 from fastapi.middleware.cors import CORSMiddleware
 import json
+import asyncio
+import aiofiles
+import os
 
 from app.database import engine, Base
 from app.routers import firewall
@@ -42,8 +45,42 @@ async def websocket_endpoint(websocket: WebSocket):
 
 # A helper we can use later to broadcast Suricata/Wazuh alerts to the React UI
 async def broadcast_alert(alert_data: dict):
+    dead_connections = []
     for connection in active_connections:
-        await connection.send_text(json.dumps(alert_data))
+        try:
+            await connection.send_text(json.dumps(alert_data))
+        except Exception:
+            dead_connections.append(connection)
+    for dead in dead_connections:
+        if dead in active_connections:
+            active_connections.remove(dead)
+
+async def tail_log_file():
+    log_path = "/var/log/personal-firewall/blocks.jsonl"
+    
+    # Create file if it doesn't exist to prevent errors
+    os.makedirs(os.path.dirname(log_path), exist_ok=True)
+    if not os.path.exists(log_path):
+        with open(log_path, 'a') as f:
+            pass
+            
+    async with aiofiles.open(log_path, mode='r') as f:
+        # Seek to the end of the file so we only get new alerts
+        await f.seek(0, 2)
+        while True:
+            line = await f.readline()
+            if not line:
+                await asyncio.sleep(0.5)
+                continue
+            try:
+                alert_data = json.loads(line)
+                await broadcast_alert(alert_data)
+            except json.JSONDecodeError:
+                pass
+
+@app.on_event("startup")
+async def startup_event():
+    asyncio.create_task(tail_log_file())
 
 @app.get("/")
 def read_root():
