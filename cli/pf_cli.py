@@ -12,9 +12,31 @@ from rich.panel import Panel
 app = typer.Typer(help="Personal Firewall SOC CLI")
 console = Console()
 
-API_BASE = "http://localhost:8000/api/firewall"
-WS_BASE = "ws://localhost:8000/ws/alerts"
-API_ROOT = "http://localhost:8000"
+import os
+from pathlib import Path
+
+# Load .env if present (checking current and project root directories)
+def _load_env():
+    for p in [Path(".env"), Path("../.env"), Path(__file__).resolve().parent.parent / ".env"]:
+        if p.exists():
+            with open(p, "r") as f:
+                for line in f:
+                    line = line.strip()
+                    if line and not line.startswith("#") and "=" in line:
+                        k, v = line.split("=", 1)
+                        if k.strip() not in os.environ:
+                            os.environ[k.strip()] = v.strip().strip('"').strip("'")
+            break
+
+_load_env()
+
+SERVER_IP = os.getenv("UBUNTU_SERVER_IP", "10.116.145.251")
+SERVER_PORT = os.getenv("BACKEND_PORT", "8000")
+SERVER_HOST = os.getenv("FIREWALL_HOST", f"{SERVER_IP}:{SERVER_PORT}")
+
+API_ROOT = f"http://{SERVER_HOST}"
+API_BASE = f"http://{SERVER_HOST}/api/firewall"
+WS_BASE = f"ws://{SERVER_HOST}/ws/alerts"
 
 @app.command()
 def status():
@@ -23,9 +45,14 @@ def status():
         response = requests.get(f"{API_ROOT}/", timeout=5)
         response.raise_for_status()
         data = response.json()
-        console.print(Panel(f"[bold green]Status: {data.get('status', 'online')}[/]\n{data.get('message', 'API is running')}", title="System Status"))
+        console.print(Panel(
+            f"[bold green]Status: {data.get('status', 'online')}[/]\n"
+            f"[bold cyan]Backend Host:[/] {API_ROOT}\n"
+            f"{data.get('message', 'API is running')}", 
+            title="System Status"
+        ))
     except Exception as e:
-        console.print(f"[bold red]Error:[/] Could not connect to the backend API. Is it running? ({e})")
+        console.print(f"[bold red]Error:[/] Could not connect to backend at {API_ROOT}. Is it running? ({e})")
 
 @app.command()
 def list():
