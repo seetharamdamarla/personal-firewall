@@ -96,8 +96,8 @@ pip install -r requirements.txt
 *   `python3 pf_cli.py threat <IP>` : Query the threat intelligence score for a specific IP.
 *   `python3 pf_cli.py monitor` : Connect to the WebSocket stream and watch real-time Suricata and Wazuh alerts print directly to your terminal.
 
-### Developer Workflow
-A `sync.sh` script is provided for rapid local development. It uses `rsync` to instantly push codebase changes from a local Mac to the Ubuntu server without overwriting sensitive `.env` files or virtual environments.
+### Remote Analyst Architecture
+The Python CLI runs directly on the security analyst's machine (Mac/workstation) and communicates remotely with the Ubuntu SOC server via REST APIs and WebSockets. This enforces least-privilege security and separates analyst triage tools from target infrastructure.
 
 ---
 *Architected and Developed by Seetharam Damarla*

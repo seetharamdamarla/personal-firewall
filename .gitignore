@@ -16,22 +16,20 @@ dist/
 build/
 .next/
 
-# ── Logs ──
+# ── Logs & Database ──
 *.log
 *.jsonl
-
-# ── SQLite ──
 *.db
 *.sqlite
 *.sqlite3
 
+# ── IDE & Local Tooling ──
+.vscode/
+.idea/
+pyrightconfig.json
+*.swp
+*.swo
+
 # ── OS ──
 .DS_Store
 Thumbs.db
-sync.sh
-
-# ── IDE ──
-.vscode/
-.idea/
-*.swp
-*.swo

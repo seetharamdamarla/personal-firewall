@@ -1,19 +1,16 @@
-import typer
-import requests
 import asyncio
-import websockets
 import json
-from typing import Optional
-from rich.console import Console
-from rich.table import Table
-from rich import print as rprint
-from rich.panel import Panel
-
-app = typer.Typer(help="Personal Firewall SOC CLI")
-console = Console()
-
 import os
 from pathlib import Path
+from typing import Optional
+
+import requests
+import typer
+import websockets
+from rich import print as rprint
+from rich.console import Console
+from rich.panel import Panel
+from rich.table import Table
 
 # Load .env if present (checking current and project root directories)
 def _load_env():
@@ -37,6 +34,9 @@ SERVER_HOST = os.getenv("FIREWALL_HOST", f"{SERVER_IP}:{SERVER_PORT}")
 API_ROOT = f"http://{SERVER_HOST}"
 API_BASE = f"http://{SERVER_HOST}/api/firewall"
 WS_BASE = f"ws://{SERVER_HOST}/ws/alerts"
+
+app = typer.Typer(help="Personal Firewall SOC CLI")
+console = Console()
 
 @app.command()
 def status():
